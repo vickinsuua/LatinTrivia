@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -39,5 +40,8 @@ app.use(function(err, req, res, next) {
 });
 
 app.use(express.static('public'));
+
+mongoose.connect('mongodb://localhost:27017/app', { userMongoClient: true });
+mongoose.Promise = global.Promise;
 
 module.exports = app;
