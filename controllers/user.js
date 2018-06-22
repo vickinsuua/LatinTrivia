@@ -8,6 +8,15 @@ const accountSid = "AC28d53249178beff60c6ed702cfc04388";
 const authToken = "5fdc5d2b7e830bb8a06e823c90385600";
 const client = require('twilio')(accountSid, authToken);
 
+exports.verificationPhoneDevice = (req, res, next) => {
+	User.find({ "verification.phone" : req.params.phone, "verification.device_id": req.body.device_id}).exec()
+	.then( verify => {
+		if(verify){
+			
+		}
+	}).catch();
+};
+
 exports.user_signup = (req, res, next) => {
 	User.find({ nickname: req.body.nickname }).exec().then( user => {
 		if (user.length >= 1) {
@@ -84,7 +93,7 @@ exports.user_profile = (req, res, next) => {
 
 	const id = req.params.userId;
 
-	User.findById(id).select('nickname avatar').exec().then( user => {
+	User.findById(id).select('nickname avatar extra_life').exec().then( user => {
 		if (!user) {
 			return res.status(404).json({
 				message: 'User not found'
