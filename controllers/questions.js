@@ -5,9 +5,10 @@ exports.questions_post_question =   (req, res, next) => {
 	const question = new Question({
 		_id: new mongoose.Types.ObjectId(),
 		question: req.body.question,
-		answer1: req.body.answer1,
-        answer2: req.body.answer2,
-        answer3: req.body.answer3
+		correctAnswer: req.body.correctAnswer,
+        optionB: req.body.optionB,
+		optionC: req.body.optionC,
+		category: req.body.category
 	});
 
 	question.save().then( result => {
@@ -16,9 +17,10 @@ exports.questions_post_question =   (req, res, next) => {
 			message: 'questions created',
 				createdquestion: {
 					question: result.question,
-                    answer1: result.answer1,
-                    answer2: result.answer2,
-                    answer3: result.answer3,
+                    correctAnswer: result.correctAnswer,
+                    optionB: result.optionB,
+					optionC: result.optionC,
+					category: result.category,
 					_id: result._id
 					// request: {
 					// 	type: 'GET',
