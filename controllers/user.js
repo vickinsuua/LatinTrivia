@@ -28,8 +28,10 @@ exports.user_signup = (req, res, next) => {
 					_id: new mongoose.Types.ObjectId(),
 					nickname: req.body.nickname,
 					avatar: req.body.avatar,
-					verification: req.body.verification,
-					phone: req.body.phone
+					referral_code: "123456",
+					extra_life:"0",
+					balance:"0",
+					verification: req.body.verification
 				})
 				user.save().then(result => {
 					console.log(result);
@@ -93,7 +95,7 @@ exports.user_profile = (req, res, next) => {
 
 	const id = req.params.userId;
 
-	User.findById(id).select('nickname avatar extra_life').exec().then( user => {
+	User.findById(id).select('nickname avatar  referral_code extra_life balance').exec().then( user => {
 		if (!user) {
 			return res.status(404).json({
 				message: 'User not found'
