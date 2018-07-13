@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
+const Verification = require('../models/verification');
+
 const accountSid = "AC28d53249178beff60c6ed702cfc04388";
 const authToken = "5fdc5d2b7e830bb8a06e823c90385600";
 const client = require('twilio')(accountSid, authToken);
@@ -17,26 +19,39 @@ exports.verificationPhoneDevice = (req, res, next) => {
 	}).catch();
 };
 
+exports.verificationCode = (req, res, next) => {
+
+};
+
 exports.user_signup = (req, res, next) => {
-	User.find({ nickname: req.body.nickname }).exec().then( user => {
+	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code }).exec().then( user => {
 		if (user.length >= 1) {
 			return res.status(409).json({
-				message: 'Nickname exists'
+				message: 'Phone number exists',
+				request: {
+					type: 'POST',
+					url: 'http://localhost:3000/login'
+				}
 			});
 		} else {
 				const user = new User({
 					_id: new mongoose.Types.ObjectId(),
-					nickname: req.body.nickname,
-					avatar: req.body.avatar,
-					referral_code: "123456",
+					nickname: "null",
+					avatar: "null",
+					referral_code: "null",
 					extra_life:"0",
 					balance:"0",
-					verification: req.body.verification
+					contry_code: req.body.contry_code,
+					phone: req.body.phone
 				})
 				user.save().then(result => {
 					console.log(result);
 					res.status(201).json({
-						message: 'User created'
+						message: 'User created',
+						request: {
+							type: 'POST',
+							url: 'http://localhost:3000/verification'
+						}
 					});
 				}).catch(err => {
 					console.log(err);
@@ -45,6 +60,27 @@ exports.user_signup = (req, res, next) => {
 						error: err
 					})
 				});
+		}
+	})
+};
+
+exports.user_created = (req, res, next) => {
+	Verification.find({ userId: req.params.userId, verified: "true"}).then( verify => {
+		if ( verify.length < 1){
+			return res.status(409).json({
+				message: 'User not found'
+			});
+		} else {
+			User.findByIdAndUpdate({_id: req.params.userId}, {$set:{'nickname': req.body.nickname, 'referral_code': req.body.referral_code }},
+            {new:true}).then( user => {
+				return res.status(200).json({
+                    user: user
+             	});
+			}).catch(err => {
+				return res.status(500).json({
+				  error: err
+				});
+			  }); 
 		}
 	})
 };

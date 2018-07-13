@@ -8,12 +8,8 @@ const userSchema = mongoose.Schema({
 		// match: / [a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])? /
 	},
 	avatar: { type: String },
-	verification: { 
-		verify_code: { type: String},
-		contry_code: { type: String, required: true},
-		phone: { type: String, required: true},
-		device_id: { type: String, required: true}
-	},
+	contry_code: { type: String, required: true},
+	phone: { type: String, required: true},
 	referral_code: { type: String},
 	extra_life: { type: Number},
 	balance: { type: Number }

@@ -39,7 +39,6 @@ exports.orders_post_order =  (req, res, next) => {
 	});
 	return order.save();
 	}).then(result => {
-		console.log(result);
 		res.status(201).json({
 			message: 'Order stored',
 			createdOrder: {
