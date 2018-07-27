@@ -24,8 +24,9 @@ exports.verificationCode = (req, res, next) => {
 };
 
 exports.user_signup = (req, res, next) => {
-	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code }).exec().then( user => {
-		if (user.length >= 1) {
+	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code}).exec().then( user => {
+		console.log(user.phone);
+		if (user.length >= 1 ) {
 			return res.status(409).json({
 				message: 'Phone number exists',
 				request: {
@@ -36,8 +37,8 @@ exports.user_signup = (req, res, next) => {
 		} else {
 				const user = new User({
 					_id: new mongoose.Types.ObjectId(),
-					nickname: "null",
-					avatar: "null",
+					nickname: req.body.nickname,
+					avatar: req.body.avatar,
 					referral_code: "null",
 					extra_life:"0",
 					balance:"0",
@@ -146,6 +147,23 @@ exports.user_profile = (req, res, next) => {
 		})
 	})
 }
+
+exports.users_get_all = (req, res, next) => {
+	User.find().select('_id nickname avatar contry_code phone referral_code extra_life balance').exec().then( user => {
+		if (!user) {
+			return res.status(404).json({
+				message: 'User not found'
+			})
+		}
+		res.status(200).json({
+			user: user
+		});
+	}).catch( err => {
+		res.status(500).json({
+			error: err
+		})
+	})
+};
 
 
 exports.user_delete = (req, res, next) => {

@@ -13,6 +13,8 @@ router.post('/signup', UserController.user_signup);
 
 router.get('/:userId', UserController.user_profile);
 
+router.get('/all/users', UserController.users_get_all);
+
 router.post('/login', UserController.user_login);
 
 router.delete('/:userId', checkAuth, UserController.user_delete);
