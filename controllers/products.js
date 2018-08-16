@@ -95,7 +95,6 @@ exports.products_update_product = (req, res, next) => {
 		updateOps[ops.propName] = ops.value;
 	}
 	Product.update({ _id: id },{ $set: updateOps } ).exec().then( result => {
-		console.log(result);
 		res.status(200).json({
 			message: "product update",
 			request: {

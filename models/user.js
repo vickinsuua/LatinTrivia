@@ -10,6 +10,7 @@ const userSchema = mongoose.Schema({
 	avatar: { type: String },
 	contry_code: { type: String, required: true},
 	phone: { type: String, required: true},
+	share_code: { type: String},
 	referral_code: { type: String},
 	extra_life: { type: Number},
 	balance: { type: Number }

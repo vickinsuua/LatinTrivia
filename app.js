@@ -10,6 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var questionRouter = require('./routes/questions');
 var verificationRouter = require('./routes/verifications');
+var reportRouter = require('./routes/report')
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use('/', indexRouter);
 app.use(apiversion+'/user', usersRouter);
 app.use(apiversion+'/question', questionRouter);
 app.use(apiversion+'/verification', verificationRouter);
+app.use(apiversion+'/report', reportRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -44,7 +46,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.use(express.static('public'));
+app.use('/uploads',express.static('uploads'));
 
 mongoose.connect('mongodb://localhost:27017/app', { userMongoClient: true });
 mongoose.Promise = global.Promise;

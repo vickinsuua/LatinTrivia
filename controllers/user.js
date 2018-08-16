@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
+
 const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
@@ -10,22 +11,8 @@ const accountSid = "AC28d53249178beff60c6ed702cfc04388";
 const authToken = "5fdc5d2b7e830bb8a06e823c90385600";
 const client = require('twilio')(accountSid, authToken);
 
-exports.verificationPhoneDevice = (req, res, next) => {
-	User.find({ "verification.phone" : req.params.phone, "verification.device_id": req.body.device_id}).exec()
-	.then( verify => {
-		if(verify){
-			
-		}
-	}).catch();
-};
-
-exports.verificationCode = (req, res, next) => {
-
-};
-
 exports.user_signup = (req, res, next) => {
 	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code}).exec().then( user => {
-		console.log(user.phone);
 		if (user.length >= 1 ) {
 			return res.status(409).json({
 				message: 'Phone number exists',
@@ -37,8 +24,9 @@ exports.user_signup = (req, res, next) => {
 		} else {
 				const user = new User({
 					_id: new mongoose.Types.ObjectId(),
-					nickname: req.body.nickname,
-					avatar: req.body.avatar,
+					nickname: "null",
+					avatar: "null",
+					share_code:"null",
 					referral_code: "null",
 					extra_life:"0",
 					balance:"0",
@@ -100,14 +88,7 @@ exports.user_login = (req, res, next) => {
 					});
 				}
 				if ( result ) {
-					const token = jwt.sign({
-						nickname: user.nickname,
-						userId: user._id
-					}, 
-					process.env.JWT_KEY,
-					{
-						expiresIn: "1h"
-					});
+					
 					return res.status(200).json({
 						message: 'Auth successful',
 						token: token
@@ -131,6 +112,8 @@ exports.user_login = (req, res, next) => {
 exports.user_profile = (req, res, next) => {
 
 	const id = req.params.userId;
+
+	Verification.findOne({"device_id":req.body.device_id, "token":req.body.device_id})
 
 	User.findById(id).select('nickname avatar  referral_code extra_life balance').exec().then( user => {
 		if (!user) {
@@ -177,3 +160,44 @@ exports.user_delete = (req, res, next) => {
 		})
 	});
 };
+
+
+
+exports.register_final = (req, res, next) => {
+	Verification.findOne({"device_id": req.body.device_id, "verified": true}).then( verification => {
+		User.findOneAndUpdate({ _id: verification.userId},
+			{$set:{"avatar": req.body.avatar, "nickname":req.body.nickname, "share_code":req.body.nickname , "referral_code":req.body.referral_code }},{new: true}).exec().then( result => {
+				User.findOneAndUpdate({ share_code: result.referral_code },{ $inc: {'extra_life':1 } }).then( otherUser => {
+					if(otherUser){
+						User.findOneAndUpdate({ referral_code: otherUser.share_code, _id: verification.userId },{ $inc: {'extra_life':1} }).then( final => {
+							console.log(final)
+							res.status(200).json({
+								message: 'Register complete'
+							})
+						}).catch(err => {
+							console.log(err);
+							res.status(500).json({
+								error: err
+							});
+						})
+					} else {
+						res.status(200).json({
+							message: 'Register complete'
+						})
+					}
+				}).catch(err => {
+					console.log(err);
+					res.status(500).json({
+						error: err
+					});
+				})
+		   }).catch( err => {
+			   console.log(err);
+			   res.status(500).json({
+				   error: err
+			   });
+		   })
+	})
+	
+};
+
