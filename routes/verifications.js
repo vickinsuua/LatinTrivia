@@ -4,9 +4,9 @@ var router = express.Router();
 const VerificationController = require('../controllers/verification');
 
 
-router.post('/', VerificationController.verificationCode);
+router.post('/', VerificationController.verification);
 
-router.patch('/code/:device_id', VerificationController.verification);
+router.patch('/code/:device_id', VerificationController.verification_code);
 
 
 

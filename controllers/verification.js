@@ -16,17 +16,13 @@ exports.verificationPhoneDevice = (req, res, next) => {
 	}).catch();
 };
 
-exports.verificationCode = (req, res, next) => {
-	console.log('1');
+exports.verification = (req, res, next) => {
 	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code}).exec().then( user => {
-		console.log('2');
 		if (user.length > 1 ) {
-			console.log('2.1');
 			return res.status(409).json({
 				message: 'User exist'
 			});
 		} else {
-			console.log('2.2');
 				const user = new User({
 					_id: new mongoose.Types.ObjectId(),
 					nickname: "null",
@@ -39,13 +35,10 @@ exports.verificationCode = (req, res, next) => {
 					phone: req.body.phone
 				})
 				user.save().then(user => {
-					console.log('3');
 					Verification.findOne({"device_id":req.body.device_id}).exec().then( device => {
-						console.log('4');
 						if(device){
 							console.log(device);
 						} else{
-							console.log('5');
 							const verification = new Verification({
 								_id: new mongoose.Types.ObjectId(),
 								userId: user._id,
@@ -54,12 +47,10 @@ exports.verificationCode = (req, res, next) => {
 								device_id: req.body.device_id
 							})
 							verification.save().then(result => {
-								console.log('6');
 								res.status(201).json({
 									message: 'User and Verification code created'
 								});
 							}).catch(err => {
-								console.log(err);
 								res.status(500).json({
 									message: 'Something when wrong',
 									error: err
@@ -68,7 +59,6 @@ exports.verificationCode = (req, res, next) => {
 						}
 					})
 				}).catch(err => {
-					console.log(err);
 					res.status(500).json({
 						message: 'Something when wrong',
 						error: err
@@ -79,7 +69,7 @@ exports.verificationCode = (req, res, next) => {
 	})
 };
 
-exports.verification = (req, res, next) => {
+exports.verification_code = (req, res, next) => {
 	Verification.findOne({"device_id" : req.params.device_id , "verify_code": req.body.verify_code}).then( verify => {
 		if(verify){
 			const token = jwt.sign({

@@ -10,7 +10,9 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var questionRouter = require('./routes/questions');
 var verificationRouter = require('./routes/verifications');
-var reportRouter = require('./routes/report')
+var reportRouter = require('./routes/report');
+var gameRouter = require('./routes/games');
+var settingRouter = require('./routes/settings');
 
 var app = express();
 
@@ -29,6 +31,8 @@ app.use(apiversion+'/user', usersRouter);
 app.use(apiversion+'/question', questionRouter);
 app.use(apiversion+'/verification', verificationRouter);
 app.use(apiversion+'/report', reportRouter);
+app.use(apiversion+'/game', gameRouter);
+app.use(apiversion+'/setting', settingRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

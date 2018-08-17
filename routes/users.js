@@ -46,8 +46,6 @@ router.post('/login', UserController.user_login);
 
 router.delete('/:userId', checkAuth, UserController.user_delete);
 
-router.post('/:userId',UserController.user_created);
-
-router.patch('/registerfinal',UserController.register_final);
+router.patch('/registerfinal',upload.single('avatar'),UserController.register_final);
 
 module.exports = router;
