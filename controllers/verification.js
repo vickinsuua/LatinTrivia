@@ -17,7 +17,7 @@ exports.verificationPhoneDevice = (req, res, next) => {
 };
 
 exports.verification = (req, res, next) => {
-	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code}).exec().then( user => {
+	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code, "device_id": req.body.device_id}).exec().then( user => {
 		if (user.length > 1 ) {
 			return res.status(409).json({
 				message: 'User exist'
@@ -39,23 +39,49 @@ exports.verification = (req, res, next) => {
 						if(device){
 							console.log(device);
 						} else{
-							const verification = new Verification({
-								_id: new mongoose.Types.ObjectId(),
-								userId: user._id,
-								verify_code: Math.floor(Math.random() * (9999 - 1000)) + 1000,
-								verified: false,
-								device_id: req.body.device_id
-							})
-							verification.save().then(result => {
-								res.status(201).json({
-									message: 'User and Verification code created'
-								});
-							}).catch(err => {
-								res.status(500).json({
-									message: 'Something when wrong',
-									error: err
+							if(!(user.phone == undefined)){
+								const verification = new Verification({
+									_id: new mongoose.Types.ObjectId(),
+									userId: user._id,
+									verify_code: Math.floor(Math.random() * (9999 - 1000)) + 1000,
+									verified: false,
+									device_id: req.body.device_id
 								})
-							});
+								verification.save().then(result => {
+									res.status(201).json({
+										message: 'User and Verification code created'
+									});
+								}).catch(err => {
+									res.status(500).json({
+										message: 'Something when wrong',
+										error: err
+									})
+								});
+							} else{
+								const token = jwt.sign({
+									_id: user._id,
+								}, 
+								process.env.JWT_KEY);
+								const verification = new Verification({
+									_id: new mongoose.Types.ObjectId(),
+									userId: user._id,
+									verify_code: null,
+									token:req.body.token,
+									verified: true,
+									Facebook: true,
+									device_id: req.body.device_id
+								})
+								verification.save().then(result => {
+									res.status(201).json({
+										message: 'User and Verification code created'
+									});
+								}).catch(err => {
+									res.status(500).json({
+										message: 'Something when wrong',
+										error: err
+									})
+								});
+							}
 						}
 					})
 				}).catch(err => {
@@ -100,4 +126,3 @@ exports.verification_code = (req, res, next) => {
 	});
 	
 }
-

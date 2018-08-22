@@ -31,14 +31,14 @@ const upload = multer({
 
 const UserController = require('../controllers/user');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+// /* GET users listing. */
+// router.get('/', function(req, res, next) {
+//   res.send('respond with a resource');
+// });
 
 router.post('/signup', upload.single('avatar'), UserController.user_signup);
 
-router.get('/:userId',checkDevice, UserController.user_profile);
+router.get('/',checkDevice, UserController.user_profile);
 
 router.get('/all/users', UserController.users_get_all);
 

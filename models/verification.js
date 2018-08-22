@@ -6,6 +6,7 @@ const verificationSchema = mongoose.Schema({
     verify_code: { type: String},
     token: {type: String},
     verified: { type: Boolean },
+    Facebook: {type: Boolean},
     device_id: { type: String, required: true}
 });
 

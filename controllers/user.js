@@ -111,24 +111,30 @@ exports.user_login = (req, res, next) => {
 
 exports.user_profile = (req, res, next) => {
 
-	const id = req.params.userId;
-	
-		User.findById(id).select('nickname avatar  referral_code extra_life balance').exec().then( user => {
-			if (!user) {
-				return res.status(404).json({
-					message: 'User not found'
+		Verification.findOne({"device_id":req.headers['device_id']}).exec().then( result => {
+			if(result){
+				User.findById(result.userId).select('nickname avatar  referral_code extra_life balance').exec().then( user => {
+					if (!user) {
+						return res.status(404).json({
+							message: 'User not found'
+						})
+					}
+					res.status(200).json(
+						user
+					);
+				}).catch( err => {
+					res.status(500).json({
+						error: err
+					})
 				})
+			} else{
+				console.log('noi')
 			}
-			res.status(200).json(
-				user
-			);
 		}).catch( err => {
 			res.status(500).json({
 				error: err
 			})
 		})
-
-	
 }
 
 exports.users_get_all = (req, res, next) => {
@@ -164,11 +170,9 @@ exports.user_delete = (req, res, next) => {
 
 
 exports.register_final = (req, res, next) => {
-	console.log(req.file.path);
-	console.log(req.body)
 	Verification.findOne({"device_id": req.body.device_id, "verified": true}).then( verification => {
 		User.findOneAndUpdate({ _id: verification.userId},
-			{$set:{"avatar": req.file.path, "nickname":req.body.nickname, "share_code":req.body.nickname , "referral_code":req.body.referral_code }},{new: true}).exec().then( result => {
+			{$set:{"nickname":req.body.nickname, "share_code":req.body.nickname , "referral_code":req.body.referral_code }},{new: true}).exec().then( result => {
 				User.findOneAndUpdate({ share_code: result.referral_code },{ $inc: {'extra_life':1 } }).then( otherUser => {
 					if(otherUser){
 						User.findOneAndUpdate({ referral_code: otherUser.share_code, _id: verification.userId },{ $inc: {'extra_life':1} }).then( final => {
