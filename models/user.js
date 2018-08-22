@@ -16,6 +16,8 @@ const userSchema = mongoose.Schema({
 	extra_life: { type: Number},
 	balance: { type: Number }
 
+},{
+    versionKey: false
 });
 
 module.exports = mongoose.model('User', userSchema);

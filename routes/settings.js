@@ -5,7 +5,7 @@ const SettingController = require('../controllers/setting');
 
 
 router.post('/', SettingController.create_setting);
-router.get('/:id', SettingController.get_setting);
+router.get('/:type', SettingController.get_setting);
 
 
 module.exports = router;

@@ -8,6 +8,8 @@ const verificationSchema = mongoose.Schema({
     verified: { type: Boolean },
     Facebook: {type: Boolean},
     device_id: { type: String, required: true}
+},{
+    versionKey: false
 });
 
 module.exports = mongoose.model('Verification', verificationSchema);

@@ -7,6 +7,8 @@ const balanceSchema = mongoose.Schema({
     game: { type: String}, //{type: mongoose.Schema.Types.ObjectId, ref: 'Game', required: true },
     // timestamps: true,
     prize: {type:Number}
+},{
+    versionKey: false
 });
 
 balanceSchema.plugin(timestamps);

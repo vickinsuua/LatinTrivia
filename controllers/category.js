@@ -1,19 +1,17 @@
 const mongoose = require('mongoose');
-const Setting = require('../models/setting');
+const Category = require('../models/category');
 
-exports.create_setting = (req, res, next) => {
-    const setting = new Setting({
+exports.create_category= (req, res, next) => {
+    const category = new Category({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         description: req.body.description,
-        link: req.body.link,
-        type: req.body.type
     });
     
-    setting.save().then( result => {
+    category.save().then( result => {
         console.log(result);
         res.status(201).json({
-            message: 'setting created'
+            message: 'category created'
     });
     }).catch( err => {
 		console.log(err);
@@ -21,18 +19,16 @@ exports.create_setting = (req, res, next) => {
 	})
 };
 
-exports.get_setting = (req, res, next) => {
-    Setting.findOne({"type":req.params.type}).then( result => {
+exports.get_category = (req, res, next) => {
+    Category.find().select('_id name description').exec().then( result => {
         if (result) {
-            console.log(result)
             res.status(200).json(
                 result
             );
             
         }else{
-            console.log("1.3")
             return res.status(404).json({
-                message: 'Result not found'
+                message: 'Category not found'
             })
         }
         

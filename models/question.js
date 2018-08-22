@@ -7,6 +7,8 @@ const questionSchema = mongoose.Schema({
     optionB: {type: String, required: true },
 	optionC: {type: String, required: true },
 	category: {type: String, required: true}
+},{
+    versionKey: false
 });
 
 module.exports = mongoose.model('Question', questionSchema);

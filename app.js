@@ -13,6 +13,7 @@ var verificationRouter = require('./routes/verifications');
 var reportRouter = require('./routes/report');
 var gameRouter = require('./routes/games');
 var settingRouter = require('./routes/settings');
+var categoryRouter = require('./routes/categorys');
 
 var app = express();
 
@@ -33,6 +34,7 @@ app.use(apiversion+'/verification', verificationRouter);
 app.use(apiversion+'/report', reportRouter);
 app.use(apiversion+'/game', gameRouter);
 app.use(apiversion+'/setting', settingRouter);
+app.use(apiversion+'/category', categoryRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
