@@ -22,9 +22,9 @@ exports.create_category= (req, res, next) => {
 exports.get_category = (req, res, next) => {
     Category.find().select('_id name description').exec().then( result => {
         if (result) {
-            res.status(200).json(
-                result
-            );
+            res.status(200).json({
+                categories:result
+            });
             
         }else{
             return res.status(404).json({

@@ -6,7 +6,7 @@ const questionSchema = mongoose.Schema({
 	correctAnswer: {type: String, required: true },
     optionB: {type: String, required: true },
 	optionC: {type: String, required: true },
-	category: {type: String, required: true}
+	category: {type: mongoose.Schema.Types.ObjectId, ref: 'category', required: true }
 },{
     versionKey: false
 });
