@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const Chatkit = require('@pusher/chatkit-server');
+
+const chatkit = new Chatkit.default({
+    instanceLocator: "v1:us1:8c31d173-b797-4deb-b2aa-b3c7c6087ec3",
+    key: "061b7c3d-1001-48de-b1e8-75985a991265:7PuAdA8f43rzIW+0DypFzfoQF1vor9cIzwNVVjAVblI=",
+  });
 
 
 const bcrypt = require('bcrypt');
@@ -34,6 +40,14 @@ exports.user_signup = (req, res, next) => {
 					phone: req.body.phone
 				})
 				user.save().then(result => {
+					chatkit.createUser({
+						id: result._id,
+						name: result.nickname,
+					  }).then(() => {
+						  console.log('User created successfully');
+						}).catch((err) => {
+						  console.log(err);
+						});
 					console.log(result);
 					res.status(201).json({
 						message: 'User created',
