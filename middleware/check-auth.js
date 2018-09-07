@@ -1,14 +1,11 @@
-const jwt = require('jsonwebtoken');
+const codes = require('../responseCodes');
 
-module.exports = (req, res, next) =>{
-	try {
-		const token = req.headers.authorization.split(" ")[1];
-		const decoded = jwt.verify(token, process.env.JWT_KEY);
-		req.userData = decoded;
+module.exports = (req, res, next) => {
+	if(req.headers['api-token'] == process.env.ACCOUNT_SECURITY_API_KEY) {
 		next();
-	} catch(error) {
+	}else{
 		return res.status(401).json({
-			message: 'Auth failed'
-		})
+			response : codes.AuthFailed
+		});
 	}
-};
+ };

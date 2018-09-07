@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
-
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
 const Verification = require('../models/verification');
-
+const codes = require('../responseCodes');
 const User = require('../models/user');
+const moment = require('moment');
+const { validationResult } = require('express-validator/check');
 
 exports.verificationPhoneDevice = (req, res, next) => {
 	User.find({ "verification.phone" : req.params.phone, "verification.device_id": req.body.device_id}).exec()
@@ -17,15 +17,99 @@ exports.verificationPhoneDevice = (req, res, next) => {
 };
 
 exports.verification = (req, res, next) => {
-	User.find({ "phone":  req.body.phone, "contry_code": req.body.contry_code, "device_id": req.body.device_id}).exec().then( user => {
-		if (user.length > 1 ) {
-			return res.status(409).json({
-				message: 'User exist'
-			});
+	var momentUnix = moment().unix();
+	User.findOne({ "phone":  req.body.phone, "contry_code": req.body.contry_code}).exec().then( user => {
+		if(user){
+			Verification.findOne({"userId": user._id, "device_id": req.body.device_id}).exec().then( device => {
+				if(device){
+					if(momentUnix-device.moment_unix<=60){
+						return res.status(400).json({
+						  response : codes.delayTimeVerification,
+						  moment_unix: device.moment_unix
+						});
+					  } else {
+						Verification.findOneAndUpdate(
+							{_id:device._id},
+							{$set:{'verify_code':Math.floor(Math.random() * (9999 - 1000)) + 1000, moment_unix: momentUnix, verified:false, token:null}},
+							{new:true}
+							).then(verification => {
+								  return res.status(200).json({
+										  response : codes.verificationCreated,
+										  data: verification
+								  });
+						  })
+						  .catch(err => {
+							return res.status(500).json({
+							  error: err.message
+							});
+						  }); 
+					  }
+				} else {
+					Verification.findOneAndUpdate(
+						{userId:user._id},
+						{$set:{'verify_code':Math.floor(Math.random() * (9999 - 1000)) + 1000, moment_unix: momentUnix, verified:false, user:null, token:null}},
+						{new:true}
+						).then(verification => {
+							console.log(verification)
+							Verification.findOne({device_id: req.body.device_id })
+							.populate({
+							  path: 'user',
+							  match: { user: req.body.phone }
+							})
+							.exec()
+							.then(device => {
+							  if(device){
+								Verification.findOneAndUpdate(
+								  {_id:device._id},
+								  {$set:{'verify_code':Math.floor(Math.random() * (9999 - 1000)) + 1000, moment_unix: momentUnix, verified:false, user:user._id, token:null}},
+								  {new:true}
+								  ).then(verification => {
+									return res.status(200).json({
+											response : codes.verificationCreated,
+											data: verification
+									});
+								})
+								.catch(err => {
+								  return res.status(500).json({
+									error: err.message
+								  });
+								});
+							  }else{
+								const verification = new Verification({
+								  _id: mongoose.Types.ObjectId(),
+								  userId: user._id,
+								  token:null,
+								  verify_code: Math.floor(Math.random() * (9999 - 1000)) + 1000,
+								  verified:false,
+								  device_id: req.body.device_id,
+								  moment_unix: momentUnix
+								});
+								verification.save().then(verification => {
+									  return res.status(200).json({
+											  response : codes.verificationCreated,
+											  data: verification
+									  });
+								}).catch(err => {
+								  return res.status(500).json({
+									error: err.message
+								  });
+								});
+							  }
+							}).catch(err => {
+							  return res.status(500).json({
+								error: err.message
+							  });
+							});
+						}).catch(err => {
+						  return res.status(500).json({
+							error: err.message
+						  });
+						}); 
+				}
+			})
 		} else {
 				const user = new User({
 					_id: new mongoose.Types.ObjectId(),
-					nickname: "null",
 					avatar: "null",
 					share_code:"null",
 					referral_code: "null",
@@ -37,7 +121,27 @@ exports.verification = (req, res, next) => {
 				user.save().then(user => {
 					Verification.findOne({"device_id":req.body.device_id}).exec().then( device => {
 						if(device){
-							console.log(device);
+							if(momentUnix-device.moment_unix<=60){
+								return res.status(400).json({
+								  response : codes.delayTimeVerification,
+								  moment_unix: device.moment_unix
+								});
+							  }
+							  Verification.findOneAndUpdate(
+								{_id:device._id},
+								{$set:{'verify_code':Math.floor(Math.random() * (9999 - 1000)) + 1000, moment_unix: momentUnix, verified:false, user:user._id, token:null}},
+								{new:true}
+								).then(verification => {
+									return res.status(200).json({
+											response : codes.verificationCreated,
+											data: verification
+									});
+							  })
+							  .catch(err => {
+								return res.status(500).json({
+								  error: err.message
+								});
+							  });  
 						} else{
 							if(!(user.phone == undefined)){
 								const verification = new Verification({
@@ -58,10 +162,6 @@ exports.verification = (req, res, next) => {
 									})
 								});
 							} else{
-								const token = jwt.sign({
-									_id: user._id,
-								}, 
-								process.env.JWT_KEY);
 								const verification = new Verification({
 									_id: new mongoose.Types.ObjectId(),
 									userId: user._id,
@@ -96,33 +196,49 @@ exports.verification = (req, res, next) => {
 };
 
 exports.verification_code = (req, res, next) => {
-	Verification.findOne({"device_id" : req.params.device_id , "verify_code": req.body.verify_code}).then( verify => {
-		if(verify){
-			const token = jwt.sign({
-				device_id: verify.device_id,
-			}, 
-			process.env.JWT_KEY);
-			Verification.update({ "device_id" : req.params.device_id , "verify_code": req.body.verify_code}, {$set: {"verified": true, "token": token}}).exec()
-			.then( code => {
-				if(code){
-					return res.status(200).json({
-						message: 'verificado'
-					});
-				}else {
-					return res.status(409).json({
-						message: 'wrong code'
+	const errors = validationResult(req);
+	Verification.findOne({"userId":req.body.userId}).exec().then( verifications => {
+		if (verifications){
+			Verification.updateMany({"userId":verifications.userId},{$set: {"verified": false}}).exec().then( device => {
+				if (device) {
+					Verification.findOne({"device_id" : req.params.device_id , "verify_code": req.body.verify_code, "verified": false}).exec().then( verify => {
+						if(verify){
+							const token = jwt.sign({
+								device_id: verify.device_id,
+							}, 
+							process.env.JWT_KEY);
+							Verification.update({ "device_id" : req.params.device_id , "verify_code": req.body.verify_code}, {$set: {"verified": true, "token": token}}).exec()
+							.then( verification => {
+								return res.status(200).json({
+									response : codes.correctlyVerifiedDevice,
+									data: verification
+									});
+							}).catch();
+						} else {
+							console.log(verify.verify_code)
+							return res.status(400).json({
+								response : codes.failedVerification
+							 });
+						}
+					}).catch(err => {
+						return res.status(500).json({
+							error: err.message
+						});
 					});
 				}
-			}).catch();
-		} else {
-			console.log('no');
+			}).catch(err => {
+				return res.status(500).json({
+					error: err.message
+				});
+			});
+		} else{
+			return res.status(400).json({
+				response : codes.failedVerification
+			 });
 		}
 	}).catch(err => {
-		console.log(err);
-		res.status(500).json({
-			message: 'Something when wrong',
-			error: err
-		})
-	});
-	
+				return res.status(500).json({
+					error: err.message
+				});
+			});
 }

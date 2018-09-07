@@ -1,10 +1,12 @@
 var express = require('express');
 var router = express.Router();
+const checkAuth = require('../middleware/check-auth');
+const checkDevice = require('../middleware/check-device');
 
 const NLPController = require('../controllers/nlp');
 
 
-router.post('/', NLPController.test);
+router.post('/', checkDevice,checkAuth,NLPController.test);
 
 
 module.exports = router;

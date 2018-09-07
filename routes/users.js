@@ -3,6 +3,7 @@ var router = express.Router();
 const checkAuth = require('../middleware/check-auth');
 const checkDevice = require('../middleware/check-device');
 const multer = require('multer');
+const { check, validationResult } = require('express-validator/check');
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, './uploads/');
@@ -36,16 +37,13 @@ const UserController = require('../controllers/user');
 //   res.send('respond with a resource');
 // });
 
-router.post('/signup', upload.single('avatar'), UserController.user_signup);
 
-router.get('/',checkDevice, UserController.user_profile);
+router.get('/',checkDevice,checkAuth, UserController.user_profile);
 
-router.get('/all/users', UserController.users_get_all);
+router.get('/all/users',checkAuth, UserController.users_get_all);
 
-router.post('/login', UserController.user_login);
+// router.patch('/addExtraLife' ,UserController.add_extra_life);
 
-router.delete('/:userId', checkAuth, UserController.user_delete);
-
-router.patch('/registerfinal',upload.single('avatar'),UserController.register_final);
+router.patch('/registerfinal',checkDevice,checkAuth,UserController.register_final);
 
 module.exports = router;

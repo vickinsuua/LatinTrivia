@@ -2,12 +2,7 @@ var mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
 	_id: mongoose.Schema.Types.ObjectId,
-	nickname: {
-		type: String,
-		required: true,
-		unique: true 
-		// match: / [a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])? /
-	},
+	nickname: { type: String},
 	avatar: { type: String},
 	contry_code: { type: String},
 	phone: { type: String},
