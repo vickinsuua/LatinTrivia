@@ -6,8 +6,8 @@ const checkDevice = require('../middleware/check-device');
 const SettingController = require('../controllers/setting');
 
 
-router.post('/', checkDevice,checkAuth,SettingController.create_setting);
-router.get('/:type',checkDevice,checkAuth, SettingController.get_setting);
+router.post('/',checkAuth,SettingController.create_setting);
+router.get('/:type',checkAuth, SettingController.get_setting);
 
 
 module.exports = router;

@@ -6,7 +6,7 @@ const checkDevice = require('../middleware/check-device');
 const NLPController = require('../controllers/nlp');
 
 
-router.post('/', checkDevice,checkAuth,NLPController.test);
+router.post('/', checkAuth,NLPController.test);
 
 
 module.exports = router;

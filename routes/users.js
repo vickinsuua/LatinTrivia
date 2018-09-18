@@ -38,12 +38,12 @@ const UserController = require('../controllers/user');
 // });
 
 
-router.get('/',checkDevice,checkAuth, UserController.user_profile);
+router.get('/',checkAuth, UserController.user_profile);
 
 router.get('/all/users',checkAuth, UserController.users_get_all);
 
 // router.patch('/addExtraLife' ,UserController.add_extra_life);
 
-router.patch('/registerfinal',checkDevice,checkAuth,UserController.register_final);
+router.patch('/registerfinal',upload.single('avatar'),checkDevice,checkAuth,UserController.register_final);
 
 module.exports = router;

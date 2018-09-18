@@ -50,7 +50,6 @@ exports.verification = (req, res, next) => {
 						{$set:{'verify_code':Math.floor(Math.random() * (9999 - 1000)) + 1000, moment_unix: momentUnix, verified:false, user:null, token:null}},
 						{new:true}
 						).then(verification => {
-							console.log(verification)
 							Verification.findOne({device_id: req.body.device_id })
 							.populate({
 							  path: 'user',
@@ -111,6 +110,7 @@ exports.verification = (req, res, next) => {
 				const user = new User({
 					_id: new mongoose.Types.ObjectId(),
 					avatar: "null",
+					nickname: "null",
 					share_code:"null",
 					referral_code: "null",
 					extra_life:"0",
@@ -197,7 +197,7 @@ exports.verification = (req, res, next) => {
 
 exports.verification_code = (req, res, next) => {
 	const errors = validationResult(req);
-	Verification.findOne({"userId":req.body.userId}).exec().then( verifications => {
+	Verification.findOne({"device_id":req.params.device_id}).exec().then( verifications => {
 		if (verifications){
 			Verification.updateMany({"userId":verifications.userId},{$set: {"verified": false}}).exec().then( device => {
 				if (device) {
@@ -215,7 +215,6 @@ exports.verification_code = (req, res, next) => {
 									});
 							}).catch();
 						} else {
-							console.log(verify.verify_code)
 							return res.status(400).json({
 								response : codes.failedVerification
 							 });

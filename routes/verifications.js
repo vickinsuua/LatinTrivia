@@ -8,6 +8,6 @@ const VerificationController = require('../controllers/verification');
 
 
 router.post('/',checkAuth,VerificationController.verification);
-router.patch('/code/:device_id',[check('verify_code').exists().isString()], VerificationController.verification_code);
+router.patch('/code/:device_id',VerificationController.verification_code);
 
 module.exports = router;

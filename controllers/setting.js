@@ -24,13 +24,11 @@ exports.create_setting = (req, res, next) => {
 exports.get_setting = (req, res, next) => {
     Setting.findOne({"type":req.params.type}).then( result => {
         if (result) {
-            console.log(result)
             res.status(200).json(
                 result
             );
             
         }else{
-            console.log("1.3")
             return res.status(404).json({
                 message: 'Result not found'
             })
