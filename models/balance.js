@@ -5,11 +5,11 @@ const balanceSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     game: {type: mongoose.Schema.Types.ObjectId, ref: 'Game', required: true },
+    prize: {type: Number}
  
 },{
-    versionKey: false
+    versionKey: false,
+    timestamps: true
 });
-
-balanceSchema.plugin(timestamps);
 
 module.exports = mongoose.model('Balance', balanceSchema);

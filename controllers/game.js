@@ -22,7 +22,6 @@ exports.create_game = (req, res, next) => {
 
 exports.get_game = (req, res, next) => {
     var date = new Date();
-    console.log(date)
     Game.findOne({"date":{$gte:date}}).then( game => {
         if (game) {
             res.status(200).json(

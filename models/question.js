@@ -8,7 +8,8 @@ const questionSchema = mongoose.Schema({
 	optionC: {type: String, required: true },
 	category: {type: mongoose.Schema.Types.ObjectId, ref: 'category', required: true }
 },{
-    versionKey: false
+    versionKey: false,
+    timestamps: true
 });
 
 module.exports = mongoose.model('Question', questionSchema);

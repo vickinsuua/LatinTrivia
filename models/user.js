@@ -8,11 +8,11 @@ const userSchema = mongoose.Schema({
 	phone: { type: String},
 	share_code: { type: String},
 	referral_code: { type: String},
-	extra_life: { type: Number},
-	balance: { type: Number }
+	extra_life: { type: Number}
 
 },{
-    versionKey: false
+    versionKey: false,
+    timestamps: true
 });
 
 module.exports = mongoose.model('User', userSchema);

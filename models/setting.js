@@ -7,7 +7,8 @@ const settingSchema = mongoose.Schema({
     link: { type: String},
     type: { type: String}
 },{
-    versionKey: false
+    versionKey: false,
+    timestamps: true
 });
 
 module.exports = mongoose.model('Setting', settingSchema);

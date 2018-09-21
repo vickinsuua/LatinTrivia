@@ -5,7 +5,8 @@ const categorySchema =  mongoose.Schema({
     name: {type: String, require: true},
     description: {type: String, require:true}
 },{
-    versionKey: false
+    versionKey: false,
+    timestamps: true
 });
 
 module.exports = mongoose.model('category', categorySchema);

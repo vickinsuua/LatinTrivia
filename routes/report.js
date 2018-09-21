@@ -7,8 +7,10 @@ const ReportController = require('../controllers/reports');
 
 
 router.post('/',checkAuth, ReportController.create_balance);
+router.get('/leaderboard',checkAuth, ReportController.historial_balance);
+router.get('/leaderboard/week',checkAuth, ReportController.week_balance);
 router.get('/games/week',checkAuth, ReportController.games_week);
-router.get('/friends/:id',checkAuth, ReportController.friends);
+router.get('/friends/:id',checkAuth, ReportController.historial_friends);
 router.get('/all',checkAuth,ReportController.all_time);
 
 
