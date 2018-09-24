@@ -76,7 +76,7 @@ exports.users_get_all = (req, res, next) => {
 };
 
 exports.register_final = (req, res, next) => {
-	Verification.findOne({"device_id": req.body.device_id, "verified": true}).then( verification => {
+	Verification.findOne({"device_id": req.headers['device_id'], "verified": true}).then( verification => {
 		console.log(req.body);
 		User.findOneAndUpdate({ _id: verification.userId},
 			{$set:{"avatar":req.file.filename,"nickname":req.body.nickname, "share_code":req.body.nickname , "referral_code":req.body.referral_code }},{new: true}).exec().then( result => {

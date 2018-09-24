@@ -6,7 +6,8 @@ exports.create_game = (req, res, next) => {
     const game = new Game({
         _id: new mongoose.Types.ObjectId(),
         date: req.body.date,
-        prize: req.body.prize
+        prize: req.body.prize,
+        status: req.body.status
     });
     
     game.save().then( result => {
