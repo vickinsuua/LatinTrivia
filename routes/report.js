@@ -11,9 +11,7 @@ router.get('/leaderboard',checkAuth, ReportController.historial_balance);
 router.get('/leaderboard/week',checkAuth, ReportController.week_balance);
 router.get('/games/week',checkAuth, ReportController.games_week);
 router.get('/friends/:id',checkAuth, ReportController.historial_friends);
+router.get('/friends/week/:id',checkAuth, ReportController.week_friends);
 router.get('/all',checkAuth,ReportController.all_time);
-
-
-
 
 module.exports = router;

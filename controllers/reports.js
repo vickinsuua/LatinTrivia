@@ -42,7 +42,8 @@ exports.historial_balance = (req, res, next) => {
                 foreignField:"_id",
                 as:"users"
             }
-        }
+        },
+        {$unwind: '$users'}
     ]).exec().then( total => {
         if (total) {
             res.status(200).json(
@@ -93,10 +94,15 @@ exports.week_balance = (req, res, next) => {
         },
         {$unwind: '$users'}
     ]).exec().then( balances => {
-        balances.forEach(function(usersBalance){
-            console.log(usersBalance.totalBalance)
-            console.log(usersBalance.users.nickname)
-        });
+        if (balances) {
+            res.status(200).json(
+                balances
+            );
+        }else{
+            return res.status(404).json({
+                message: 'Balance not found'
+            })
+        }
     }).catch(err => {
 		res.status(500).json({ error: err})
 	})
@@ -126,6 +132,7 @@ exports.games_week = (req, res, next) => {
 };
 
 exports.historial_friends = (req, res, next) => {
+    var balances_array = [];
     User.findOne({"_id":req.params.id}).exec().then( user => {
         User.find({$or:[{"share_code": user.referral_code},{"referral_code":user.share_code}]}).exec().then( friends => {
             friends.forEach(function(element){
@@ -154,10 +161,10 @@ exports.historial_friends = (req, res, next) => {
                     },
                     {$unwind: '$users'}
                 ]).exec().then( friendsB => {
-                    friendsB.forEach(function(usersFriendsBalance){
-                        console.log(usersFriendsBalance.totalBalance)
-                        console.log(usersFriendsBalance.users.nickname)
-                    });
+                    balances_array.push(friendsB[0]);
+                    if(balances_array.length == friends.length){
+                        res.status(200).json(balances_array)
+                    }
                 }).catch(err => {
                     res.status(500).json({ error: err})
                 })
@@ -174,7 +181,10 @@ exports.week_friends = (req, res, next) => {
     var date_week = new Date();
     var date = new Date();
     var days = 3;
+    var balances_array = [];
     date_week.setDate(date_week.getDate() - days)
+    console.log(date_week)
+    console.log(date)
     User.findOne({"_id":req.params.id}).exec().then( user => {
         User.find({$or:[{"share_code": user.referral_code},{"referral_code":user.share_code}]}).exec().then( friends => {
             friends.forEach(function(element){
@@ -205,12 +215,13 @@ exports.week_friends = (req, res, next) => {
                         }
                     },
                     {$unwind: '$users'}
-                ]).exec().then( friendsB => {
-                    friendsB.forEach(function(usersFriendsBalance){
-                        console.log(usersFriendsBalance.totalBalance)
-                        console.log(usersFriendsBalance.users.nickname)
-                    });
-                }).catch(err => {
+                ]).exec().then( friendsBW => {
+                    balances_array.push(friendsBW[0]);
+                    if(balances_array.length == friends.length){
+                            res.status(200).json(balances_array)
+                    }
+                })
+                .catch(err => {
                     res.status(500).json({ error: err})
                 })
             })
