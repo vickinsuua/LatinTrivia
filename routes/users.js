@@ -45,5 +45,6 @@ router.get('/all/users',checkAuth, UserController.users_get_all);
 // router.patch('/addExtraLife' ,UserController.add_extra_life);
 
 router.patch('/registerfinal',upload.single('avatar'),checkDevice,checkAuth,UserController.register_final);
+router.patch('/add/extra/life/:id',checkAuth,UserController.add_extra_life);
 
 module.exports = router;

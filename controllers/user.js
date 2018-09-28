@@ -117,3 +117,38 @@ exports.register_final = (req, res, next) => {
 	
 };
 
+exports.add_extra_life = (req, res, next) => {
+	User.findOneAndUpdate({ _id: req.params.id},{$set:{"referral_code":req.body.referral_code}}).exec().then( result => {
+		console.log(result)
+		User.findOneAndUpdate({ share_code: req.body.referral_code},{ $inc: {'extra_life':1 } }).then( otherUser => {
+			console.log(otherUser)
+			if(otherUser){
+				User.findOneAndUpdate({ "_id": req.params.id},{ $inc: {'extra_life':1} }).then( final => {
+					console.log(final)
+					res.status(200).json({
+						message: 'Add extra life'
+					})
+				}).catch(err => {
+					res.status(500).json({
+						error: err
+					});
+				})
+			} else {
+				res.status(200).json({
+					message: 'Cant add life'
+				})
+			}
+		}).catch(err => {
+			console.log(err);
+			res.status(500).json({
+				error: err
+			});
+		})
+		}).catch( err => {
+			console.log(err);
+			res.status(500).json({
+				error: err
+			});
+		})
+};
+
